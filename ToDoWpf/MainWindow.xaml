@@ -7,6 +7,42 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
+        <!--グリッドの行のサイズを設定する-->
+        <Grid.RowDefinitions>
+            <!--上段には新規タスク追加用のテキストボックスとボタンを配置-->
+            <RowDefinition Height="auto" />
+            <!--下段（残り領域全部）にはタスク一覧を配置-->
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
         
+        <!--上段のレイアウト-->
+        <Grid Grid.Row="0">
+            <!--テキストボックスとボタンを横にくっつける-->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <!--テキストボックスの幅は残りの領域-->
+                    <ColumnDefinition Width="*" />
+                    <!--ボタンの幅は自動-->
+                    <ColumnDefinition Width="auto" />
+                </Grid.ColumnDefinitions>
+                
+                <!--テキストボックス-->
+                <!--Gridタグの子要素にしてもよいが、1つの要素しか入れないのでこう書いて簡略化する-->
+                <TextBox x:Name="tbInputTask" Grid.Column="0" />
+                
+                <!--押しにくいので左右に余白を設ける-->
+                <!--パディングは以下のパターンで設定できる-->
+                <!-- Padding="左,上,右,下" -->
+                <!-- Padding="左右,上下" -->
+                <!-- Padding="上下左右" -->
+                <Button x:Name="btnInputTask" Content="追加" Grid.Column="1" Padding="10,0" />
+            </Grid>
+        </Grid>
+        
+        <!--下段のレイアウト-->
+        <Grid Grid.Row="1">
+            <!--タスク一覧を表示するリストボックス（派生型の ListView というものもある）-->
+            <ListBox x:Name="lbTasks" />
+        </Grid>
     </Grid>
 </Window>
