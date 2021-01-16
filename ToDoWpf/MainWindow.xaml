@@ -35,7 +35,7 @@
                 <!-- Padding="左,上,右,下" -->
                 <!-- Padding="左右,上下" -->
                 <!-- Padding="上下左右" -->
-                <Button x:Name="btnInputTask" Content="追加" Grid.Column="1" Padding="10,0" />
+                <Button x:Name="btnInputTask" Content="追加" Grid.Column="1" Padding="10,0" Click="btnInputTask_Click" />
             </Grid>
         </Grid>
         
