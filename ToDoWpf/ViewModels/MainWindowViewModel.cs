@@ -68,6 +68,9 @@ namespace ToDoWpf.ViewModels
             // object型の引数を1つ取るメソッドでなければならないが（ラムダ式も可能）
             // Prismなど著名なライブラリを使えばこの辺りの不便さは解決されている
             AddCommand = CreateCommand(ExecuteAddCommand, CanExecuteAddCommand);
+
+            // アプリケーション設定からタスク一覧を読み込む
+            Tasks = Properties.Settings.Default.Tasks ?? new ObservableCollection<string>();
         }
 
         /// <summary>
@@ -78,6 +81,9 @@ namespace ToDoWpf.ViewModels
         {
             Tasks.Add(InputTask);
             InputTask = string.Empty;
+
+            // アプリケーション設定にタスク一覧を保存する
+            Properties.Settings.Default.Tasks = Tasks;
         }
 
         /// <summary>

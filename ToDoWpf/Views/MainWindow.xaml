@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:ToDoWpf.Views"
         xmlns:vm="clr-namespace:ToDoWpf.ViewModels"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="450" Width="800"
+        Closing="Window_Closing">
     <!--このViewに紐付くViewModelクラスを指定-->
     <Window.DataContext>
         <vm:MainWindowViewModel />

@@ -9,6 +9,8 @@
 //------------------------------------------------------------------------------
 
 
+using System.Collections.ObjectModel;
+
 namespace ToDoWpf.Properties
 {
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
@@ -23,6 +25,20 @@ namespace ToDoWpf.Properties
             get
             {
                 return defaultInstance;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public ObservableCollection<string> Tasks
+        {
+            get
+            {
+                return ((ObservableCollection<string>)(this["Tasks"]));
+            }
+            set
+            {
+                this["Tasks"] = value;
             }
         }
     }

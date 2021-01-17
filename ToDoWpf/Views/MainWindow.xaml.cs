@@ -28,5 +28,15 @@ namespace ToDoWpf.Views
         {
             InitializeComponent();
         }
+
+        /// <summary>
+        /// ウィンドウが閉じられるときのイベントハンドラ
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            Properties.Settings.Default.Save();
+        }
     }
 }
