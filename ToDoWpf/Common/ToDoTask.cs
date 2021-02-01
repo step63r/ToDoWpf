@@ -11,7 +11,7 @@ namespace ToDoWpf.Common
         /// <summary>
         /// 一意な識別子
         /// </summary>
-        public Guid Guid { get; private set; }
+        public Guid Guid { get; set; }
         /// <summary>
         /// タスク名
         /// </summary>

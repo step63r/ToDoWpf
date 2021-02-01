@@ -1,4 +1,6 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
+using System.IO;
 using System.Windows.Input;
 using ToDoWpf.Common;
 
@@ -82,6 +84,13 @@ namespace ToDoWpf.ViewModels
         public ICommand RemoveCommand { get; private set; }
         #endregion
 
+        #region メンバ変数
+        /// <summary>
+        /// 設定ファイルパス
+        /// </summary>
+        private static readonly string _filePath = $@"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\ToDoWpf\ToDoTasks.xml";
+        #endregion
+
         /// <summary>
         /// コンストラクタ
         /// </summary>
@@ -95,7 +104,9 @@ namespace ToDoWpf.ViewModels
             RemoveCommand = CreateCommand(ExecuteRemoveCommand, CanExecuteRemoveCommand);
 
             // アプリケーション設定からタスク一覧を読み込む
-            Tasks = Properties.Settings.Default.Tasks ?? new ObservableCollection<ToDoTask>();
+            CreateSettingsIfNotExists();
+            var ret = XmlConverter.DeSerialize<ObservableCollection<ToDoTask>>(_filePath);
+            Tasks = ret ?? new ObservableCollection<ToDoTask>();
         }
 
         /// <summary>
@@ -108,7 +119,7 @@ namespace ToDoWpf.ViewModels
             InputTask = new ToDoTask();
 
             // アプリケーション設定にタスク一覧を保存する
-            Properties.Settings.Default.Tasks = Tasks;
+            XmlConverter.Serialize(Tasks, _filePath);
         }
 
         /// <summary>
@@ -131,7 +142,7 @@ namespace ToDoWpf.ViewModels
             SelectedTask = null;
 
             // アプリケーション設定にタスク一覧を保存する
-            Properties.Settings.Default.Tasks = Tasks;
+            XmlConverter.Serialize(Tasks, _filePath);
         }
 
         /// <summary>
@@ -142,6 +153,23 @@ namespace ToDoWpf.ViewModels
         private bool CanExecuteRemoveCommand(object parameter)
         {
             return SelectedTask != null && Tasks.Contains(SelectedTask);
+        }
+
+        /// <summary>
+        /// 設定ファイルが存在しない場合、作成する
+        /// </summary>
+        private static void CreateSettingsIfNotExists()
+        {
+            // ディレクトリ取得
+            string dirInfo = Path.GetDirectoryName(_filePath);
+            Directory.CreateDirectory(dirInfo);
+
+            // ファイルが存在しなければ作る
+            if (!File.Exists(_filePath))
+            {
+                var obj = new ObservableCollection<ToDoTask>();
+                XmlConverter.Serialize(obj, _filePath);
+            }
         }
     }
 }

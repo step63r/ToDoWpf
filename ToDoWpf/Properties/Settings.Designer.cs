@@ -28,19 +28,5 @@ namespace ToDoWpf.Properties
                 return defaultInstance;
             }
         }
-
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public ObservableCollection<ToDoTask> Tasks
-        {
-            get
-            {
-                return ((ObservableCollection<ToDoTask>)(this["Tasks"]));
-            }
-            set
-            {
-                this["Tasks"] = value;
-            }
-        }
     }
 }
