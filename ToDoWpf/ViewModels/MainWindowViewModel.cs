@@ -49,6 +49,26 @@ namespace ToDoWpf.ViewModels
                 }
             }
         }
+
+        private string _selectedTask = "";
+        /// <summary>
+        /// タスク一覧から選択されたタスク
+        /// </summary>
+        public string SelectedTask
+        {
+            get
+            {
+                return _selectedTask;
+            }
+            set
+            {
+                if (_selectedTask != value)
+                {
+                    _selectedTask = value;
+                    RaisePropertyChanged(nameof(SelectedTask));
+                }
+            }
+        }
         #endregion
 
         #region コマンド
@@ -56,6 +76,10 @@ namespace ToDoWpf.ViewModels
         /// 追加コマンド
         /// </summary>
         public ICommand AddCommand { get; private set; }
+        /// <summary>
+        /// 削除コマンド
+        /// </summary>
+        public ICommand RemoveCommand { get; private set; }
         #endregion
 
         /// <summary>
@@ -68,6 +92,7 @@ namespace ToDoWpf.ViewModels
             // object型の引数を1つ取るメソッドでなければならないが（ラムダ式も可能）
             // Prismなど著名なライブラリを使えばこの辺りの不便さは解決されている
             AddCommand = CreateCommand(ExecuteAddCommand, CanExecuteAddCommand);
+            RemoveCommand = CreateCommand(ExecuteRemoveCommand, CanExecuteRemoveCommand);
 
             // アプリケーション設定からタスク一覧を読み込む
             Tasks = Properties.Settings.Default.Tasks ?? new ObservableCollection<string>();
@@ -94,6 +119,29 @@ namespace ToDoWpf.ViewModels
         private bool CanExecuteAddCommand(object parameter)
         {
             return !string.IsNullOrEmpty(InputTask);
+        }
+
+        /// <summary>
+        /// 削除コマンドを実行する
+        /// </summary>
+        /// <param name="parameter">パラメータ</param>
+        private void ExecuteRemoveCommand(object parameter)
+        {
+            Tasks.Remove(SelectedTask);
+            SelectedTask = string.Empty;
+
+            // アプリケーション設定にタスク一覧を保存する
+            Properties.Settings.Default.Tasks = Tasks;
+        }
+
+        /// <summary>
+        /// 削除コマンドが実行可能かどうか判定する
+        /// </summary>
+        /// <param name="parameter">パラメータ</param>
+        /// <returns></returns>
+        private bool CanExecuteRemoveCommand(object parameter)
+        {
+            return !string.IsNullOrEmpty(SelectedTask) && Tasks.Contains(SelectedTask);
         }
     }
 }
