@@ -78,9 +78,8 @@
                                 <Setter Property="Background" Value="LightBlue" />
                             </DataTrigger>
                             <!--期限超過していたら背景色を変更する-->
-                            <!--Tips: 優先度が高くても期限超過ならこの色になる-->
                             <DataTrigger Binding="{Binding Path=DueDate, Converter={StaticResource IsPastDayConverter}}" Value="True">
-                                <Setter Property="Background" Value="PaleVioletRed" />
+                                <Setter Property="Foreground" Value="Red" />
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
