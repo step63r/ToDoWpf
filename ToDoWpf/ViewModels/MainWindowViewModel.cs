@@ -10,11 +10,11 @@ namespace ToDoWpf.ViewModels
     public class MainWindowViewModel : ViewModelBase
     {
         #region プロパティ
-        private ObservableCollection<string> _tasks = new ObservableCollection<string>();
+        private ObservableCollection<ToDoTask> _tasks = new ObservableCollection<ToDoTask>();
         /// <summary>
         /// タスク一覧
         /// </summary>
-        public ObservableCollection<string> Tasks
+        public ObservableCollection<ToDoTask> Tasks
         {
             get
             {
@@ -30,11 +30,11 @@ namespace ToDoWpf.ViewModels
             }
         }
 
-        private string _inputTask = "";
+        private ToDoTask _inputTask = new ToDoTask();
         /// <summary>
         /// 入力されたタスク
         /// </summary>
-        public string InputTask
+        public ToDoTask InputTask
         {
             get
             {
@@ -50,11 +50,11 @@ namespace ToDoWpf.ViewModels
             }
         }
 
-        private string _selectedTask = "";
+        private ToDoTask _selectedTask;
         /// <summary>
         /// タスク一覧から選択されたタスク
         /// </summary>
-        public string SelectedTask
+        public ToDoTask SelectedTask
         {
             get
             {
@@ -95,7 +95,7 @@ namespace ToDoWpf.ViewModels
             RemoveCommand = CreateCommand(ExecuteRemoveCommand, CanExecuteRemoveCommand);
 
             // アプリケーション設定からタスク一覧を読み込む
-            Tasks = Properties.Settings.Default.Tasks ?? new ObservableCollection<string>();
+            Tasks = Properties.Settings.Default.Tasks ?? new ObservableCollection<ToDoTask>();
         }
 
         /// <summary>
@@ -105,7 +105,7 @@ namespace ToDoWpf.ViewModels
         private void ExecuteAddCommand(object parameter)
         {
             Tasks.Add(InputTask);
-            InputTask = string.Empty;
+            InputTask = new ToDoTask();
 
             // アプリケーション設定にタスク一覧を保存する
             Properties.Settings.Default.Tasks = Tasks;
@@ -118,7 +118,7 @@ namespace ToDoWpf.ViewModels
         /// <returns></returns>
         private bool CanExecuteAddCommand(object parameter)
         {
-            return !string.IsNullOrEmpty(InputTask);
+            return !string.IsNullOrEmpty(InputTask.Name);
         }
 
         /// <summary>
@@ -128,7 +128,7 @@ namespace ToDoWpf.ViewModels
         private void ExecuteRemoveCommand(object parameter)
         {
             Tasks.Remove(SelectedTask);
-            SelectedTask = string.Empty;
+            SelectedTask = null;
 
             // アプリケーション設定にタスク一覧を保存する
             Properties.Settings.Default.Tasks = Tasks;
@@ -141,7 +141,7 @@ namespace ToDoWpf.ViewModels
         /// <returns></returns>
         private bool CanExecuteRemoveCommand(object parameter)
         {
-            return !string.IsNullOrEmpty(SelectedTask) && Tasks.Contains(SelectedTask);
+            return SelectedTask != null && Tasks.Contains(SelectedTask);
         }
     }
 }

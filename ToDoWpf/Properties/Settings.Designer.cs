@@ -10,6 +10,7 @@
 
 
 using System.Collections.ObjectModel;
+using ToDoWpf.Common;
 
 namespace ToDoWpf.Properties
 {
@@ -30,11 +31,11 @@ namespace ToDoWpf.Properties
 
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public ObservableCollection<string> Tasks
+        public ObservableCollection<ToDoTask> Tasks
         {
             get
             {
-                return ((ObservableCollection<string>)(this["Tasks"]));
+                return ((ObservableCollection<ToDoTask>)(this["Tasks"]));
             }
             set
             {

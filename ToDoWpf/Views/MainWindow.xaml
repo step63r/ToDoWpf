@@ -35,7 +35,7 @@
                 
                 <!--テキストボックス-->
                 <!--Gridタグの子要素にしてもよいが、1つの要素しか入れないのでこう書いて簡略化する-->
-                <TextBox x:Name="tbInputTask" Grid.Column="0" Text="{Binding InputTask, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBox x:Name="tbInputTask" Grid.Column="0" Text="{Binding InputTask.Name, UpdateSourceTrigger=PropertyChanged}" />
                 
                 <!--押しにくいので左右に余白を設ける-->
                 <!--パディングは以下のパターンで設定できる-->
@@ -50,7 +50,22 @@
         <!--下段のレイアウト-->
         <Grid Grid.Row="1">
             <!--タスク一覧を表示するリストボックス（派生型の ListView というものもある）-->
-            <ListBox x:Name="lbTasks" ItemsSource="{Binding Tasks}" SelectedItem="{Binding SelectedTask}" />
+            <ListBox x:Name="lbTasks" ItemsSource="{Binding Tasks}" SelectedItem="{Binding SelectedTask}" DisplayMemberPath="Name" />
+            <!--同じ文字列にも別のGuidが振られていることを確認するには、↓こちらをコメントアウトする-->
+            <!--<ListBox x:Name="lbTasks" ItemsSource="{Binding Tasks}" SelectedItem="{Binding SelectedTask}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock>
+                            <TextBlock.Text>
+                                <MultiBinding StringFormat="{}{0} | {1}">
+                                    <Binding Path="Guid" />
+                                    <Binding Path="Name" />
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>-->
         </Grid>
     </Grid>
 </Window>
