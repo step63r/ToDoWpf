@@ -66,6 +66,7 @@
     <Compile Include="Common\ToDoTask.cs" />
     <Compile Include="Common\ViewModelBase.cs" />
     <Compile Include="Common\XmlConverter.cs" />
+    <Compile Include="Converters\IsPastDayConverter.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>

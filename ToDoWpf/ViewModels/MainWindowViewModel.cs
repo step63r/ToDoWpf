@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Windows.Input;
 using ToDoWpf.Common;
 
@@ -71,6 +73,17 @@ namespace ToDoWpf.ViewModels
                 }
             }
         }
+
+        /// <summary>
+        /// 優先度（コンボボックスにバインドする）
+        /// </summary>
+        public IEnumerable<Priority> Priorities
+        {
+            get
+            {
+                return Enum.GetValues(typeof(Priority)).Cast<Priority>();
+            }
+        }
         #endregion
 
         #region コマンド
@@ -106,7 +119,11 @@ namespace ToDoWpf.ViewModels
             // アプリケーション設定からタスク一覧を読み込む
             CreateSettingsIfNotExists();
             var ret = XmlConverter.DeSerialize<ObservableCollection<ToDoTask>>(_filePath);
+
             Tasks = ret ?? new ObservableCollection<ToDoTask>();
+
+            // ソートしとく
+            Tasks = SortTasks(Tasks);
         }
 
         /// <summary>
@@ -117,6 +134,9 @@ namespace ToDoWpf.ViewModels
         {
             Tasks.Add(InputTask);
             InputTask = new ToDoTask();
+
+            // ソートしとく
+            Tasks = SortTasks(Tasks);
 
             // アプリケーション設定にタスク一覧を保存する
             XmlConverter.Serialize(Tasks, _filePath);
@@ -140,6 +160,9 @@ namespace ToDoWpf.ViewModels
         {
             Tasks.Remove(SelectedTask);
             SelectedTask = null;
+
+            // ソートしとく
+            Tasks = SortTasks(Tasks);
 
             // アプリケーション設定にタスク一覧を保存する
             XmlConverter.Serialize(Tasks, _filePath);
@@ -170,6 +193,19 @@ namespace ToDoWpf.ViewModels
                 var obj = new ObservableCollection<ToDoTask>();
                 XmlConverter.Serialize(obj, _filePath);
             }
+        }
+
+        /// <summary>
+        /// タスク一覧をソートする
+        /// </summary>
+        /// <param name="source">元コレクション</param>
+        /// <returns>ソートされたコレクション</returns>
+        /// <remarks>一度 List に変換しないとソートできないため、仕方なくこうする</remarks>
+        private ObservableCollection<ToDoTask> SortTasks(ObservableCollection<ToDoTask> source)
+        {
+            var taskList = source.ToList();
+            taskList.Sort();
+            return new ObservableCollection<ToDoTask>(taskList);
         }
     }
 }

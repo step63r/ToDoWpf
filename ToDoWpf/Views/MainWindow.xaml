@@ -5,6 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ToDoWpf.Views"
         xmlns:vm="clr-namespace:ToDoWpf.ViewModels"
+        xmlns:common="clr-namespace:ToDoWpf.Common"
+        xmlns:conv="clr-namespace:ToDoWpf.Converters"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800"
         Closing="Window_Closing">
@@ -12,6 +14,9 @@
     <Window.DataContext>
         <vm:MainWindowViewModel />
     </Window.DataContext>
+    <Window.Resources>
+        <conv:IsPastDayConverter x:Key="IsPastDayConverter" />
+    </Window.Resources>
     <Grid>
         <!--グリッドの行のサイズを設定する-->
         <Grid.RowDefinitions>
@@ -28,6 +33,10 @@
                 <Grid.ColumnDefinitions>
                     <!--テキストボックスの幅は残りの領域-->
                     <ColumnDefinition Width="*" />
+                    <!--日付選択コントロールの幅は自動-->
+                    <ColumnDefinition Width="auto" />
+                    <!--優先度コンボボックスの幅は自動-->
+                    <ColumnDefinition Width="auto" />
                     <!--ボタンの幅は自動-->
                     <ColumnDefinition Width="auto" />
                     <ColumnDefinition Width="auto" />
@@ -37,20 +46,46 @@
                 <!--Gridタグの子要素にしてもよいが、1つの要素しか入れないのでこう書いて簡略化する-->
                 <TextBox x:Name="tbInputTask" Grid.Column="0" Text="{Binding InputTask.Name, UpdateSourceTrigger=PropertyChanged}" />
                 
+                <!--日付選択コントロール-->
+                <DatePicker Grid.Column="1" SelectedDate="{Binding InputTask.DueDate}" />
+                
+                <!--優先度コンボボックス-->
+                <ComboBox Grid.Column="2" ItemsSource="{Binding Priorities}" SelectedItem="{Binding InputTask.Priority}" />
+
                 <!--押しにくいので左右に余白を設ける-->
                 <!--パディングは以下のパターンで設定できる-->
                 <!-- Padding="左,上,右,下" -->
                 <!-- Padding="左右,上下" -->
                 <!-- Padding="上下左右" -->
-                <Button x:Name="btnInputTask" Content="追加" Grid.Column="1" Padding="10,0" Command="{Binding AddCommand}" />
-                <Button x:Name="btnRemoveTask" Content="削除" Grid.Column="2" Padding="10,0" Command="{Binding RemoveCommand}" />
+                <Button x:Name="btnInputTask" Content="追加" Grid.Column="3" Padding="10,0" Command="{Binding AddCommand}" />
+                <Button x:Name="btnRemoveTask" Content="削除" Grid.Column="4" Padding="10,0" Command="{Binding RemoveCommand}" />
             </Grid>
         </Grid>
         
         <!--下段のレイアウト-->
         <Grid Grid.Row="1">
             <!--タスク一覧を表示するリストボックス（派生型の ListView というものもある）-->
-            <ListBox x:Name="lbTasks" ItemsSource="{Binding Tasks}" SelectedItem="{Binding SelectedTask}" DisplayMemberPath="Name" />
+            <ListBox x:Name="lbTasks" ItemsSource="{Binding Tasks}" SelectedItem="{Binding SelectedTask}" DisplayMemberPath="Name">
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="{x:Type ListBoxItem}">
+                        <Style.Triggers>
+                            <!--優先度 高のとき背景色を変更する-->
+                            <DataTrigger Binding="{Binding Path=Priority}" Value="{x:Static common:Priority.High}">
+                                <Setter Property="Background" Value="Yellow" />
+                            </DataTrigger>
+                            <!--優先度 低のとき背景色を変更する-->
+                            <DataTrigger Binding="{Binding Path=Priority}" Value="{x:Static common:Priority.Low}">
+                                <Setter Property="Background" Value="LightBlue" />
+                            </DataTrigger>
+                            <!--期限超過していたら背景色を変更する-->
+                            <!--Tips: 優先度が高くても期限超過ならこの色になる-->
+                            <DataTrigger Binding="{Binding Path=DueDate, Converter={StaticResource IsPastDayConverter}}" Value="True">
+                                <Setter Property="Background" Value="PaleVioletRed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+            </ListBox>
             <!--同じ文字列にも別のGuidが振られていることを確認するには、↓こちらをコメントアウトする-->
             <!--<ListBox x:Name="lbTasks" ItemsSource="{Binding Tasks}" SelectedItem="{Binding SelectedTask}">
                 <ListBox.ItemTemplate>
