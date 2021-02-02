@@ -10,7 +10,8 @@
         xmlns:tb="http://www.hardcodet.net/taskbar"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800"
-        Closing="Window_Closing">
+        Closing="Window_Closing"
+        StateChanged="Window_StateChanged">
     <!--このViewに紐付くViewModelクラスを指定-->
     <Window.DataContext>
         <vm:MainWindowViewModel />

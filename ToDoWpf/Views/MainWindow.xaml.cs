@@ -1,18 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace ToDoWpf.Views
 {
@@ -27,6 +14,7 @@ namespace ToDoWpf.Views
         public MainWindow()
         {
             InitializeComponent();
+            LoadWindowBounds();
         }
 
         /// <summary>
@@ -36,6 +24,9 @@ namespace ToDoWpf.Views
         /// <param name="e"></param>
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            // ウィンドウの位置・サイズを保存
+            SaveWindowBounds();
+
             // 通知領域に格納する設定なら終了をキャンセル
             if (Properties.Settings.Default.ExitAsMinimized)
             {
@@ -48,6 +39,19 @@ namespace ToDoWpf.Views
             {
                 e.Cancel = false;
                 Properties.Settings.Default.Save();
+            }
+        }
+
+        /// <summary>
+        /// ウィンドウの状態が変化したときのイベントハンドラ
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Window_StateChanged(object sender, EventArgs e)
+        {
+            if (WindowState == WindowState.Normal || WindowState == WindowState.Maximized)
+            {
+                ShowInTaskbar = true;
             }
         }
 
@@ -72,6 +76,50 @@ namespace ToDoWpf.Views
         {
             Properties.Settings.Default.Save();
             Application.Current.Shutdown();
+        }
+
+        /// <summary>
+        /// ウィンドウの情報を保存する
+        /// </summary>
+        private void SaveWindowBounds()
+        {
+            var settings = Properties.Settings.Default;
+            settings.WindowState = WindowState;
+            // 最大化を解除する
+            WindowState = WindowState.Normal;
+            settings.Width = Width;
+            settings.Height = Height;
+            settings.Top = Top;
+            settings.Left = Left;
+            settings.Save();
+        }
+
+        /// <summary>
+        /// ウィンドウの位置・サイズを復元する
+        /// </summary>
+        private void LoadWindowBounds()
+        {
+            var settings = Properties.Settings.Default;
+            if (settings.Left >= 0 && settings.Left + settings.Width < SystemParameters.VirtualScreenWidth)
+            {
+                Left = settings.Left;
+            }
+            if (settings.Top >= 0 && settings.Top + settings.Height < SystemParameters.VirtualScreenHeight)
+            {
+                Top = settings.Top;
+            }
+            if (settings.Width > 0 && settings.Width <= SystemParameters.WorkArea.Width)
+            {
+                Width = settings.Width;
+            }
+            if (settings.Height > 0 && settings.Height <= SystemParameters.WorkArea.Height)
+            {
+                Height = settings.Height;
+            }
+            if (settings.WindowState == WindowState.Maximized)
+            {
+                Loaded += (sender, e) => WindowState = WindowState.Maximized;
+            }
         }
     }
 }
