@@ -36,7 +36,42 @@ namespace ToDoWpf.Views
         /// <param name="e"></param>
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            // 通知領域に格納する設定なら終了をキャンセル
+            if (Properties.Settings.Default.ExitAsMinimized)
+            {
+                e.Cancel = true;
+                WindowState = WindowState.Minimized;
+                ShowInTaskbar = false;
+                taskbarIcon.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                e.Cancel = false;
+                Properties.Settings.Default.Save();
+            }
+        }
+
+        /// <summary>
+        /// ShowWindowMenuItemクリック時のイベントハンドラ
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ShowWindowMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            taskbarIcon.Visibility = Visibility.Collapsed;
+            ShowInTaskbar = true;
+            WindowState = WindowState.Normal;
+        }
+
+        /// <summary>
+        /// ExitMenuItemクリック時のイベントハンドラ
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ExitMenuItem_Click(object sender, RoutedEventArgs e)
+        {
             Properties.Settings.Default.Save();
+            Application.Current.Shutdown();
         }
     }
 }

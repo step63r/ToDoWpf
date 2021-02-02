@@ -7,6 +7,7 @@
         xmlns:vm="clr-namespace:ToDoWpf.ViewModels"
         xmlns:common="clr-namespace:ToDoWpf.Common"
         xmlns:conv="clr-namespace:ToDoWpf.Converters"
+        xmlns:tb="http://www.hardcodet.net/taskbar"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800"
         Closing="Window_Closing">
@@ -22,10 +23,22 @@
         <Grid.RowDefinitions>
             <!--上段には新規タスク追加用のテキストボックスとボタンを配置-->
             <RowDefinition Height="auto" />
-            <!--下段（残り領域全部）にはタスク一覧を配置-->
+            <!--中段（残り領域全部）にはタスク一覧を配置-->
             <RowDefinition Height="*" />
+            <!--下段には通知領域に格納するチェックボックスを配置-->
+            <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
-        
+
+        <!--通知領域-->
+        <tb:TaskbarIcon x:Name="taskbarIcon" IconSource="/ToDoWpf;component/Resources/ToDoWpf.ico" ToolTipText="ToDoWpf" Visibility="Collapsed">
+            <tb:TaskbarIcon.ContextMenu>
+                <ContextMenu>
+                    <MenuItem x:Name="ShowWindowMenuItem" Header="ウィンドウを表示" Click="ShowWindowMenuItem_Click" />
+                    <MenuItem x:Name="ExitMenuItem" Header="終了" Click="ExitMenuItem_Click" />
+                </ContextMenu>
+            </tb:TaskbarIcon.ContextMenu>
+        </tb:TaskbarIcon>
+
         <!--上段のレイアウト-->
         <Grid Grid.Row="0">
             <!--テキストボックスとボタンを横にくっつける-->
@@ -62,7 +75,7 @@
             </Grid>
         </Grid>
         
-        <!--下段のレイアウト-->
+        <!--中段のレイアウト-->
         <Grid Grid.Row="1">
             <!--タスク一覧を表示するリストボックス（派生型の ListView というものもある）-->
             <ListBox x:Name="lbTasks" ItemsSource="{Binding Tasks}" SelectedItem="{Binding SelectedTask}" DisplayMemberPath="Name">
@@ -100,6 +113,11 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>-->
+        </Grid>
+        
+        <!--下段のレイアウト-->
+        <Grid Grid.Row="2">
+            <CheckBox Content="アプリケーション終了時、通知領域に格納する" IsChecked="{Binding ExitAsMinimized}" Margin="5" />
         </Grid>
     </Grid>
 </Window>

@@ -84,6 +84,26 @@ namespace ToDoWpf.ViewModels
                 return Enum.GetValues(typeof(Priority)).Cast<Priority>();
             }
         }
+
+        private bool _exitAsMinimized = false;
+        /// <summary>
+        /// 通知領域に格納する
+        /// </summary>
+        public bool ExitAsMinimized
+        {
+            get
+            {
+                return _exitAsMinimized;
+            }
+            set
+            {
+                _exitAsMinimized = value;
+                RaisePropertyChanged(nameof(ExitAsMinimized));
+
+                // アプリケーション設定に保存
+                Properties.Settings.Default.ExitAsMinimized = value;
+            }
+        }
         #endregion
 
         #region コマンド
@@ -109,6 +129,9 @@ namespace ToDoWpf.ViewModels
         /// </summary>
         public MainWindowViewModel()
         {
+            // アプリケーション設定をロード
+            ExitAsMinimized = Properties.Settings.Default.ExitAsMinimized;
+
             // コマンドを作成する
             // 今回はViewModelBaseの仕様でExecute/CanExecuteともに
             // object型の引数を1つ取るメソッドでなければならないが（ラムダ式も可能）
