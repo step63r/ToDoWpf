@@ -58,7 +58,12 @@
                 
                 <!--テキストボックス-->
                 <!--Gridタグの子要素にしてもよいが、1つの要素しか入れないのでこう書いて簡略化する-->
-                <TextBox x:Name="tbInputTask" Grid.Column="0" Text="{Binding InputTask.Name, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBox x:Name="tbInputTask" Grid.Column="0" Text="{Binding InputTask.Name, UpdateSourceTrigger=PropertyChanged}">
+                    <!--Enterキー押下でも「追加」ボタンと同じ動作をする-->
+                    <TextBox.InputBindings>
+                        <KeyBinding Gesture="Enter" Command="{Binding AddCommand}" />
+                    </TextBox.InputBindings>
+                </TextBox>
                 
                 <!--日付選択コントロール-->
                 <DatePicker Grid.Column="1" SelectedDate="{Binding InputTask.DueDate}" />
@@ -80,6 +85,10 @@
         <Grid Grid.Row="1">
             <!--タスク一覧を表示するリストボックス（派生型の ListView というものもある）-->
             <ListBox x:Name="lbTasks" ItemsSource="{Binding Tasks}" SelectedItem="{Binding SelectedTask}" DisplayMemberPath="Name">
+                <!--Deleteキー押下でも「削除」ボタンと同じ動作をする-->
+                <ListBox.InputBindings>
+                    <KeyBinding Key="Delete" Command="{Binding RemoveCommand}" />
+                </ListBox.InputBindings>
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="{x:Type ListBoxItem}">
                         <Style.Triggers>
