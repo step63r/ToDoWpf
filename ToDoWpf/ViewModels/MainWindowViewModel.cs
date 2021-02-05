@@ -104,6 +104,26 @@ namespace ToDoWpf.ViewModels
                 Properties.Settings.Default.ExitAsMinimized = value;
             }
         }
+
+        private TaskDialogViewModel _dialogViewModel;
+        /// <summary>
+        /// ダイアログViewModel
+        /// </summary>
+        public TaskDialogViewModel DialogViewModel
+        {
+            get
+            {
+                return _dialogViewModel;
+            }
+            set
+            {
+                if (_dialogViewModel != value)
+                {
+                    _dialogViewModel = value;
+                    RaisePropertyChanged(nameof(DialogViewModel));
+                }
+            }
+        }
         #endregion
 
         #region コマンド
@@ -115,6 +135,14 @@ namespace ToDoWpf.ViewModels
         /// 削除コマンド
         /// </summary>
         public ICommand RemoveCommand { get; private set; }
+        /// <summary>
+        /// ダイアログ表示コマンド
+        /// </summary>
+        public ICommand OpenDialogCommand { get; private set; }
+        /// <summary>
+        /// ダイアログ閉じるコマンド
+        /// </summary>
+        public ICommand CloseDialogCommand { get; private set; }
         #endregion
 
         #region メンバ変数
@@ -138,6 +166,8 @@ namespace ToDoWpf.ViewModels
             // Prismなど著名なライブラリを使えばこの辺りの不便さは解決されている
             AddCommand = CreateCommand(ExecuteAddCommand, CanExecuteAddCommand);
             RemoveCommand = CreateCommand(ExecuteRemoveCommand, CanExecuteRemoveCommand);
+            OpenDialogCommand = CreateCommand(ExecuteOpenDialogCommand, CanExecuteOpenDialogCommand);
+            CloseDialogCommand = CreateCommand(ExecuteCloseDialogCommand, CanExecuteCloseDialogCommand);
 
             // アプリケーション設定からタスク一覧を読み込む
             CreateSettingsIfNotExists();
@@ -199,6 +229,47 @@ namespace ToDoWpf.ViewModels
         private bool CanExecuteRemoveCommand(object parameter)
         {
             return SelectedTask != null && Tasks.Contains(SelectedTask);
+        }
+
+        /// <summary>
+        /// ダイアログ表示コマンドを実行する
+        /// </summary>
+        /// <param name="paramenter">パラメータ</param>
+        private void ExecuteOpenDialogCommand(object paramenter)
+        {
+            DialogViewModel = new TaskDialogViewModel()
+            {
+                Task = SelectedTask
+            };
+        }
+
+        /// <summary>
+        /// ダイアログ表示コマンドが実行可能かどうか判定する
+        /// </summary>
+        /// <param name="parameter">パラメータ</param>
+        /// <returns></returns>
+        private bool CanExecuteOpenDialogCommand(object parameter)
+        {
+            return SelectedTask != null;
+        }
+
+        /// <summary>
+        /// ダイアログ閉じるコマンドを実行する
+        /// </summary>
+        /// <param name="parameter">パラメータ</param>
+        private void ExecuteCloseDialogCommand(object parameter)
+        {
+            // ダイアログから結果を受け取る必要があればここに書けばいいと思う
+        }
+
+        /// <summary>
+        /// ダイアログ閉じるコマンドが実行可能かどうか判定する
+        /// </summary>
+        /// <param name="parameter">パラメータ</param>
+        /// <returns></returns>
+        private bool CanExecuteCloseDialogCommand(object parameter)
+        {
+            return true;
         }
 
         /// <summary>

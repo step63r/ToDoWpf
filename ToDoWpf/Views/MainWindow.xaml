@@ -4,9 +4,12 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ToDoWpf.Views"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
         xmlns:vm="clr-namespace:ToDoWpf.ViewModels"
         xmlns:common="clr-namespace:ToDoWpf.Common"
         xmlns:conv="clr-namespace:ToDoWpf.Converters"
+        xmlns:behaviors="clr-namespace:ToDoWpf.Behaviors"
         xmlns:tb="http://www.hardcodet.net/taskbar"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800"
@@ -19,7 +22,16 @@
     <Window.Resources>
         <conv:IsPastDayConverter x:Key="IsPastDayConverter" />
     </Window.Resources>
-    <Grid>
+    <Grid behaviors:OpenWindowAttachedBehavior.CloseCommand="{Binding CloseDialogCommand}"
+          behaviors:OpenWindowAttachedBehavior.HasOwner="True"
+          behaviors:OpenWindowAttachedBehavior.IsModal="True"
+          behaviors:OpenWindowAttachedBehavior.WindowViewModel="{Binding DialogViewModel}">
+        <behaviors:OpenWindowAttachedBehavior.WindowTemplate>
+            <DataTemplate>
+                <local:TaskDialogView />
+            </DataTemplate>
+        </behaviors:OpenWindowAttachedBehavior.WindowTemplate>
+        
         <!--グリッドの行のサイズを設定する-->
         <Grid.RowDefinitions>
             <!--上段には新規タスク追加用のテキストボックスとボタンを配置-->
@@ -84,11 +96,22 @@
         <!--中段のレイアウト-->
         <Grid Grid.Row="1">
             <!--タスク一覧を表示するリストボックス（派生型の ListView というものもある）-->
-            <ListBox x:Name="lbTasks" ItemsSource="{Binding Tasks}" SelectedItem="{Binding SelectedTask}" DisplayMemberPath="Name">
+            <ListBox x:Name="lbTasks" ItemsSource="{Binding Tasks}" SelectedItem="{Binding SelectedTask}" HorizontalContentAlignment="Stretch">
                 <!--Deleteキー押下でも「削除」ボタンと同じ動作をする-->
                 <ListBox.InputBindings>
                     <KeyBinding Key="Delete" Command="{Binding RemoveCommand}" />
                 </ListBox.InputBindings>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <ContentControl Content="{Binding Name}" >
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="MouseDoubleClick">
+                                    <i:InvokeCommandAction Command="{Binding DataContext.OpenDialogCommand, RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </ContentControl>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="{x:Type ListBoxItem}">
                         <Style.Triggers>
