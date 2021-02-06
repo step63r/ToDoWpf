@@ -5,6 +5,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:local="clr-namespace:ToDoWpf.Views"
              xmlns:behaviors="clr-namespace:ToDoWpf.Behaviors"
+             xml:lang="ja-JP"
              mc:Ignorable="d"
              Height="200" Width="300"
              behaviors:CloseWindowAttachedBehavior.Close="{Binding CloseWindow}">
@@ -24,7 +25,7 @@
         <TextBlock Grid.Row="0" Grid.Column="1" Margin="5" Text="{Binding Task.Name}" />
 
         <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" Text="期限" />
-        <TextBlock Grid.Row="1" Grid.Column="1" Margin="5" Text="{Binding Task.DueDate, StringFormat=yyyy/MM/dd}" />
+        <TextBlock Grid.Row="1" Grid.Column="1" Margin="5" Text="{Binding Task.DueDate, StringFormat='yyyy/MM/dd (ddd)'}" />
 
         <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" Text="優先度" />
         <TextBlock Grid.Row="2" Grid.Column="1" Margin="5" Text="{Binding Task.Priority}" />
