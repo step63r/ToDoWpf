@@ -1,4 +1,7 @@
-﻿using System.Windows.Input;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Input;
 using ToDoWpf.Common;
 
 namespace ToDoWpf.ViewModels
@@ -29,6 +32,17 @@ namespace ToDoWpf.ViewModels
             }
         }
 
+        /// <summary>
+        /// 優先度（コンボボックスにバインドする）
+        /// </summary>
+        public IEnumerable<Priority> Priorities
+        {
+            get
+            {
+                return Enum.GetValues(typeof(Priority)).Cast<Priority>();
+            }
+        }
+
         private bool _closeWindow = false;
         /// <summary>
         /// このウィンドウを閉じるか
@@ -48,6 +62,11 @@ namespace ToDoWpf.ViewModels
                 }
             }
         }
+
+        /// <summary>
+        /// OKボタンが押下された場合、ここにタスクオブジェクトが入る
+        /// </summary>
+        public ToDoTask Result { get; set; } = null;
         #endregion
 
         #region コマンド
@@ -55,8 +74,13 @@ namespace ToDoWpf.ViewModels
         /// OKコマンド
         /// </summary>
         public ICommand OkCommand { get; private set; }
+        /// <summary>
+        /// Cancelコマンド
+        /// </summary>
+        public ICommand CancelCommand { get; private set; }
         #endregion
 
+        #region コンストラクタ
         /// <summary>
         /// コンストラクタ
         /// </summary>
@@ -64,33 +88,50 @@ namespace ToDoWpf.ViewModels
         {
             // コマンドを作成する
             OkCommand = CreateCommand(ExecuteOkCommand, CanExecuteOkCommand);
-
-            //Task = new ToDoTask()
-            //{
-            //    Name = "sample",
-            //    DueDate = new System.DateTime(2022, 1, 1),
-            //    Priority = Priority.Medium
-            //};
+            CancelCommand = CreateCommand(ExecuteCancelCommand, CanExecuteCancelCommand);
         }
+        #endregion
 
+        #region OkCommand
         /// <summary>
         /// OKコマンドを実行する
         /// </summary>
         /// <param name="parameter">パラメータ</param>
         private void ExecuteOkCommand(object parameter)
         {
+            Result = Task;
             CloseWindow = true;
         }
-
         /// <summary>
-        /// OKコマンド
+        /// OKコマンドが実行可能かどうか判定する
         /// </summary>
         /// <param name="parameter">パラメータ</param>
         /// <returns></returns>
         private bool CanExecuteOkCommand(object parameter)
         {
+            return !(string.IsNullOrEmpty(Task.Name) || Task.DueDate == null);
+        }
+        #endregion
+
+        #region CancelCommand
+        /// <summary>
+        /// Cancelコマンドを実行する
+        /// </summary>
+        /// <param name="parameter">パラメータ</param>
+        private void ExecuteCancelCommand(object parameter)
+        {
+            CloseWindow = true;
+        }
+        /// <summary>
+        /// Cancelコマンドが実行可能かどうか判定する
+        /// </summary>
+        /// <param name="parameter">パラメータ</param>
+        /// <returns></returns>
+        private bool CanExecuteCancelCommand(object parameter)
+        {
             // 常に実行可能
             return true;
         }
+        #endregion
     }
 }

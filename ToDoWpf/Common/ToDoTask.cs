@@ -29,7 +29,7 @@ namespace ToDoWpf.Common
     /// タスクをモデル化したクラス
     /// </summary>
     /// <remarks>分かりやすく Task という名前にすべきだったが、 System.Threading.Tasks 名前空間に Task があってややこしいのでこういう名前にする</remarks>
-    public class ToDoTask : IComparable<ToDoTask>
+    public class ToDoTask : IComparable<ToDoTask>, IEquatable<ToDoTask>
     {
         /// <summary>
         /// 一意な識別子
@@ -47,6 +47,10 @@ namespace ToDoWpf.Common
         /// 優先度
         /// </summary>
         public Priority Priority { get; set; }
+        /// <summary>
+        /// 詳細メモ
+        /// </summary>
+        public string Detail { get; set; }
 
         /// <summary>
         /// コンストラクタ
@@ -56,6 +60,19 @@ namespace ToDoWpf.Common
             Guid = Guid.NewGuid();
             DueDate = DateTime.Now;
             Priority = Priority.Medium;
+        }
+
+        /// <summary>
+        /// コピーコンストラクタ
+        /// </summary>
+        /// <param name="source">コピー元オブジェクト</param>
+        public ToDoTask(ToDoTask source)
+        {
+            Guid = source.Guid;
+            Name = source.Name;
+            DueDate = source.DueDate;
+            Priority = source.Priority;
+            Detail = source.Detail;
         }
 
         /// <summary>
@@ -81,6 +98,17 @@ namespace ToDoWpf.Common
 
             // (3) 優先度も同じなら、名前順
             return Name.CompareTo(other.Name);
+        }
+
+        /// <summary>
+        /// このクラスのオブジェクト同士が等価かどうかを判定する
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public bool Equals(ToDoTask other)
+        {
+            // Guidが等しければ同一のインスタンス
+            return Guid.Equals(other.Guid);
         }
     }
 }

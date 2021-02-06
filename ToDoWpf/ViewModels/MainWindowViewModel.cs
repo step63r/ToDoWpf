@@ -128,17 +128,17 @@ namespace ToDoWpf.ViewModels
 
         #region コマンド
         /// <summary>
-        /// 追加コマンド
-        /// </summary>
-        public ICommand AddCommand { get; private set; }
-        /// <summary>
         /// 削除コマンド
         /// </summary>
         public ICommand RemoveCommand { get; private set; }
         /// <summary>
-        /// ダイアログ表示コマンド
+        /// 新規作成コマンド
         /// </summary>
-        public ICommand OpenDialogCommand { get; private set; }
+        public ICommand CreateNewCommand { get; private set; }
+        /// <summary>
+        /// タスク詳細表示コマンド
+        /// </summary>
+        public ICommand ShowDetailCommand { get; private set; }
         /// <summary>
         /// ダイアログ閉じるコマンド
         /// </summary>
@@ -152,6 +152,7 @@ namespace ToDoWpf.ViewModels
         private static readonly string _filePath = $@"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\ToDoWpf\ToDoTasks.xml";
         #endregion
 
+        #region コンストラクタ
         /// <summary>
         /// コンストラクタ
         /// </summary>
@@ -164,9 +165,9 @@ namespace ToDoWpf.ViewModels
             // 今回はViewModelBaseの仕様でExecute/CanExecuteともに
             // object型の引数を1つ取るメソッドでなければならないが（ラムダ式も可能）
             // Prismなど著名なライブラリを使えばこの辺りの不便さは解決されている
-            AddCommand = CreateCommand(ExecuteAddCommand, CanExecuteAddCommand);
             RemoveCommand = CreateCommand(ExecuteRemoveCommand, CanExecuteRemoveCommand);
-            OpenDialogCommand = CreateCommand(ExecuteOpenDialogCommand, CanExecuteOpenDialogCommand);
+            CreateNewCommand = CreateCommand(ExecuteCreateNewCommand, CanExecuteCreateNewCommand);
+            ShowDetailCommand = CreateCommand(ExecuteShowDetailCommand, CanExecuteShowDetailCommand);
             CloseDialogCommand = CreateCommand(ExecuteCloseDialogCommand, CanExecuteCloseDialogCommand);
 
             // アプリケーション設定からタスク一覧を読み込む
@@ -178,33 +179,9 @@ namespace ToDoWpf.ViewModels
             // ソートしとく
             Tasks = SortTasks(Tasks);
         }
+        #endregion
 
-        /// <summary>
-        /// 追加コマンドを実行する
-        /// </summary>
-        /// <param name="parameter">パラメータ</param>
-        private void ExecuteAddCommand(object parameter)
-        {
-            Tasks.Add(InputTask);
-            InputTask = new ToDoTask();
-
-            // ソートしとく
-            Tasks = SortTasks(Tasks);
-
-            // アプリケーション設定にタスク一覧を保存する
-            XmlConverter.Serialize(Tasks, _filePath);
-        }
-
-        /// <summary>
-        /// 追加コマンドが実行可能かどうか判定する
-        /// </summary>
-        /// <param name="parameter">パラメータ</param>
-        /// <returns></returns>
-        private bool CanExecuteAddCommand(object parameter)
-        {
-            return !string.IsNullOrEmpty(InputTask.Name);
-        }
-
+        #region RemoveCommand
         /// <summary>
         /// 削除コマンドを実行する
         /// </summary>
@@ -220,7 +197,6 @@ namespace ToDoWpf.ViewModels
             // アプリケーション設定にタスク一覧を保存する
             XmlConverter.Serialize(Tasks, _filePath);
         }
-
         /// <summary>
         /// 削除コマンドが実行可能かどうか判定する
         /// </summary>
@@ -230,38 +206,69 @@ namespace ToDoWpf.ViewModels
         {
             return SelectedTask != null && Tasks.Contains(SelectedTask);
         }
+        #endregion
 
+        #region CreateNewCommand
         /// <summary>
-        /// ダイアログ表示コマンドを実行する
+        /// 新規作成コマンドを実行する
         /// </summary>
-        /// <param name="paramenter">パラメータ</param>
-        private void ExecuteOpenDialogCommand(object paramenter)
+        /// <param name="parameter">パラメータ</param>
+        private void ExecuteCreateNewCommand(object parameter)
         {
             DialogViewModel = new TaskDialogViewModel()
             {
-                Task = SelectedTask
+                Task = new ToDoTask()
             };
         }
-
         /// <summary>
-        /// ダイアログ表示コマンドが実行可能かどうか判定する
+        /// 新規作成コマンドが実行可能かどうか判定する
         /// </summary>
         /// <param name="parameter">パラメータ</param>
         /// <returns></returns>
-        private bool CanExecuteOpenDialogCommand(object parameter)
+        private bool CanExecuteCreateNewCommand(object parameter)
+        {
+            return true;
+        }
+        #endregion
+
+        #region ShowDetailCommand
+        /// <summary>
+        /// タスク詳細表示コマンドを実行する
+        /// </summary>
+        /// <param name="paramenter">パラメータ</param>
+        private void ExecuteShowDetailCommand(object paramenter)
+        {
+            DialogViewModel = new TaskDialogViewModel()
+            {
+                Task = new ToDoTask(SelectedTask)
+            };
+        }
+        /// <summary>
+        /// タスク詳細表示コマンドが実行可能かどうか判定する
+        /// </summary>
+        /// <param name="parameter">パラメータ</param>
+        /// <returns></returns>
+        private bool CanExecuteShowDetailCommand(object parameter)
         {
             return SelectedTask != null;
         }
+        #endregion
 
+        #region CloseDialogCommand
         /// <summary>
         /// ダイアログ閉じるコマンドを実行する
         /// </summary>
         /// <param name="parameter">パラメータ</param>
         private void ExecuteCloseDialogCommand(object parameter)
         {
-            // ダイアログから結果を受け取る必要があればここに書けばいいと思う
+            if (parameter is TaskDialogViewModel viewModel)
+            {
+                if (viewModel.Result != null)
+                {
+                    _ = UpdateTasks(viewModel.Result);
+                }
+            }
         }
-
         /// <summary>
         /// ダイアログ閉じるコマンドが実行可能かどうか判定する
         /// </summary>
@@ -271,7 +278,9 @@ namespace ToDoWpf.ViewModels
         {
             return true;
         }
+        #endregion
 
+        #region 内部メソッド
         /// <summary>
         /// 設定ファイルが存在しない場合、作成する
         /// </summary>
@@ -301,5 +310,34 @@ namespace ToDoWpf.ViewModels
             taskList.Sort();
             return new ObservableCollection<ToDoTask>(taskList);
         }
+
+        /// <summary>
+        /// タスク一覧を更新する
+        /// </summary>
+        /// <param name="targetTask">変更後のインスタンス</param>
+        /// <returns>成功/失敗</returns>
+        private bool UpdateTasks(ToDoTask targetTask)
+        {
+            bool ret = false;
+
+            var previousTask = Tasks.Where(item => item.Equals(targetTask)).FirstOrDefault();
+            if (previousTask != null)
+            {
+                // 古いオブジェクトを削除する
+                Tasks.Remove(previousTask);
+            }
+
+            // 新しいオブジェクトを追加する
+            Tasks.Add(targetTask);
+
+            // ソートしとく
+            Tasks = SortTasks(Tasks);
+
+            // アプリケーション設定にタスク一覧を保存する
+            XmlConverter.Serialize(Tasks, _filePath);
+
+            return ret;
+        }
+        #endregion
     }
 }
